@@ -7,8 +7,6 @@ import static com.jmvc.chatforfun.protocol.Command.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +36,7 @@ public class Protocol implements IProtocol{
 	{
 		out = new DataOutputStream(socket.getOutputStream());
 		in = new DataInputStream(socket.getInputStream());
-		if(usersOnline != null)
+		if(usersOnline == null)
 			usersOnline = new ArrayList<>();
 		userSocket = socket;
 	}
@@ -58,9 +56,6 @@ public class Protocol implements IProtocol{
 			
 			if(command.length() == 4 && Arrays.asList(VALID_COMMANDS).contains(command))
 			{
-				/* First, we read a space character */
-				if(ProtocolUtils.read_char(in) != ' ')
-					return false;
 				
 				boolean resultCommand = false;
 				
@@ -105,11 +100,14 @@ public class Protocol implements IProtocol{
 				
 				return resultCommand;
 			}
+			
+			writeERROCommand(ERROR_BAD_COMMAND);
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
+		
 		return false;
 	}
 	
@@ -120,6 +118,10 @@ public class Protocol implements IProtocol{
 	 */
 	private boolean readRGSTCommand() throws IOException
 	{
+		/* First, we read a space character */
+		if(ProtocolUtils.read_char(in) != ' ')
+			return false;
+		
 		List<String> params = readCommandTwoParameters();
 		
 		if(params == null)
@@ -138,6 +140,10 @@ public class Protocol implements IProtocol{
 	 */
 	private boolean readLOINCommand() throws IOException
 	{
+		/* First, we read a space character */
+		if(ProtocolUtils.read_char(in) != ' ')
+			return false;
+		
 		List<String> params = readCommandTwoParameters();
 		
 		if(params == null)
@@ -164,8 +170,12 @@ public class Protocol implements IProtocol{
 	 * @return boolean
 	 * @throws IOException
 	 */
-	private boolean readLOUTCommand()
+	private boolean readLOUTCommand() throws IOException
 	{
+		/* First, we read a space character */
+		if(ProtocolUtils.read_char(in) != ' ')
+			return false;
+		
 		if(currentUser == null || !currentUser.isUserLogged())
 			return false;
 
@@ -182,6 +192,7 @@ public class Protocol implements IProtocol{
 	 */
 	private boolean readSENDCommand() throws IOException
 	{
+		
 		if(currentUser == null || !currentUser.isUserLogged())
 			return false;
 		
@@ -289,6 +300,10 @@ public class Protocol implements IProtocol{
 	 */
 	private String readCommandOneParameter() throws IOException
 	{
+		/* First, we read a space character */
+		if(ProtocolUtils.read_char(in) != ' ')
+			return null;
+		
 		/* We read a 32-bit tag parameter <START_PARAMETER> */
 		if(!ProtocolUtils.read_command32(in).equals(Command.START_TAG))
 			return null;

@@ -36,6 +36,8 @@ class DAOUserTest {
 		
 		String friendPedro = iterator.next();
 
+		assertTrue(daoUser.existsUser(user));
+		assertTrue(daoUser.existsUser(friend));
 		assertEquals(FRIEND, friendPedro);
 		
 	}

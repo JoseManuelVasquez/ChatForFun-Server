@@ -68,6 +68,7 @@ public class ServerThread implements Runnable{
 			{
 				//TODO
 			}
+			client.close();
 		}
 		catch (IOException e)
 		{

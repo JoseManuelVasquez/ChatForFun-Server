@@ -23,5 +23,7 @@ public final class Error {
 	public static final int ERROR_WHILE_TRYING_TO_SEND_MSG = 8;
 	
 	public static final int ERROR_UNKNOWN = 9;
+	
+	public static final int ERROR_BAD_COMMAND = 10;
 
 }

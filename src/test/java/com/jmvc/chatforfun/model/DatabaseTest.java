@@ -7,12 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 
-import com.anarsoft.vmlens.concurrent.junit.ConcurrentTestRunner;
-
-/* Run in 4 parallel threads */
-@RunWith(ConcurrentTestRunner.class)
 class DatabaseTest {
 	
 	private static final String USER = "jose";
