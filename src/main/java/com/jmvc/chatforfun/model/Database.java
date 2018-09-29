@@ -77,7 +77,7 @@ public final class Database{
 	
 	/**
 	 * Method for executing a SQL command
-	 * @param sql
+	 * @param query
 	 */
 	public ResultSet executeQuery(String query)
 	{
@@ -123,6 +123,8 @@ public final class Database{
 		statement.executeUpdate(CREATE_TABLE_USER);
 		statement.executeUpdate(DROP_TABLE_FRIEND);
 		statement.executeUpdate(CREATE_TABLE_FRIEND);
+        statement.executeUpdate(DROP_TABLE_MESSAGE);
+        statement.executeUpdate(CREATE_TABLE_MESSAGE);
 	}
 
 }

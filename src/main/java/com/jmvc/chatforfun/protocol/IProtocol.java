@@ -14,6 +14,10 @@ public interface IProtocol {
 	
 	public void writeLGGDCommand();
 	
+	public void writeFRDSCommand();
+
+	public void writeNFDSCommand();
+	
 	public void writeSDEDCommand(String friend);
 	
 	public void writeRVEDCommand(String friend, String message);

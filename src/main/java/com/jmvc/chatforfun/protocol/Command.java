@@ -20,6 +20,10 @@ public final class Command {
 	
 	public static final String LOGGED_IN = "LGGD";
 	
+	public static final String LIST_FRIENDS = "FRDS";
+
+	public static final String NO_FRIENDS = "NFDS";
+	
 	public static final String MESSAGE_SENT = "SDED";
 	
 	public static final String MESSAGE_RECEIVED  = "RVED";
@@ -36,10 +40,10 @@ public final class Command {
 	
 	public static final String EXIT = "EXIT";
 	
-	public static final String[] VALID_COMMANDS = {"RGST", "LOIN", "LOUT", "SEND",
-												   "ADDF", "DELF", "DELA", "LGGD",
-												   "SDED", "RVED", "ADED", "DELD",
-												   "FDIN", "FOUT", "ERRO", "EXIT"};
+	public static final String[] VALID_COMMANDS = {"RGST", "LOIN", "LOUT", "SEND", "ADDF",
+												   "DELF", "DELA", "LGGD", "FRDS", "SDED",
+												   "RVED", "ADED", "DELD", "FDIN", "FOUT",
+												   "ERRO", "EXIT", "NFDS"};
 	
 	public static final String START_TAG = "" + (char)6 + (char)7 + (char)6 + (char)7;
 	

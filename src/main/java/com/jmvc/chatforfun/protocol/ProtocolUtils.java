@@ -12,6 +12,7 @@ public abstract class ProtocolUtils {
     
 	/**
      * Method for writing a variable length command to client
+     * @param dos
      * @param str
      * @throws IOException 
      */
@@ -28,6 +29,7 @@ public abstract class ProtocolUtils {
 	
     /**
      * Method for writing a command 32-bit to client
+     * @param dos
      * @param str
      * @throws IOException 
      */
@@ -47,6 +49,7 @@ public abstract class ProtocolUtils {
     
     /**
      * Method for writing 32-bit number
+     * @param dos
      * @param number
      * @throws IOException 
      */
@@ -60,6 +63,8 @@ public abstract class ProtocolUtils {
     
     /**
      * Method for writing character
+     * @param dos
+     * @param c
      * @throws IOException 
      */
     public static void write_char(DataOutputStream dos, char c) throws IOException
@@ -69,7 +74,7 @@ public abstract class ProtocolUtils {
     
     /**
      * Method for reading a variable command from client
-     * @param bytes
+     * @param dis
      * @return String
      * @throws IOException 
      */
@@ -88,7 +93,7 @@ public abstract class ProtocolUtils {
     
     /**
      * Method for reading a 32-bit command from client
-     * @param bytes
+     * @param dis
      * @return String
      * @throws IOException 
      */
@@ -99,6 +104,7 @@ public abstract class ProtocolUtils {
     
     /**
      * Method for reading 32 bits number
+     * @param dis
      * @return int
      * @throws IOException 
      */
@@ -112,6 +118,7 @@ public abstract class ProtocolUtils {
     
     /**
      * Method for reading character
+     * @param dis
      * @return char
      * @throws IOException 
      */
@@ -128,6 +135,7 @@ public abstract class ProtocolUtils {
     
     /**
      * Method for reading bytes from a Stream
+     * @param dis
      * @param numBytes
      * @return byte[]
      * @throws IOException 

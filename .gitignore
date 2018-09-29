@@ -1,7 +1,9 @@
 .settings/
 .git
+.idea/
 .project
 .classpath
 chatforfun.db
+chatforfun.iml
 target/
 dependency-reduced-pom.xml

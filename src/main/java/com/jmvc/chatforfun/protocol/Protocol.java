@@ -8,10 +8,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import com.jmvc.chatforfun.server.AccessDB;
 
@@ -45,6 +44,7 @@ public class Protocol implements IProtocol{
 
 	/**
 	 * Reading only a 32-bit valid command
+	 * @return boolean
 	 */
 	@Override
 	public boolean readValidCommand()
@@ -64,7 +64,7 @@ public class Protocol implements IProtocol{
 					case REGISTER:
 						resultCommand = readRGSTCommand();
 						if(!resultCommand)
-							writeERROCommand(ERROR_USER_EXISTS);
+							writeERROCommand(ERROR_USER_ALREADY_EXISTS);
 						break;
 					case LOGIN:
 						resultCommand = readLOINCommand();
@@ -72,7 +72,11 @@ public class Protocol implements IProtocol{
 							writeERROCommand(ERROR_USER_OR_PASSWORD_WRONG);
 						break;
 					case LOGOUT:
-						readLOUTCommand();
+                        resultCommand = readLOUTCommand();
+						if(resultCommand)
+						    return false;
+						else
+                            writeERROCommand(ERROR_EXPIRED_SESSION);
 						break;
 					case SEND_MESSAGE:
 						resultCommand = readSENDCommand();
@@ -118,10 +122,6 @@ public class Protocol implements IProtocol{
 	 */
 	private boolean readRGSTCommand() throws IOException
 	{
-		/* First, we read a space character */
-		if(ProtocolUtils.read_char(in) != ' ')
-			return false;
-		
 		List<String> params = readCommandTwoParameters();
 		
 		if(params == null)
@@ -140,10 +140,6 @@ public class Protocol implements IProtocol{
 	 */
 	private boolean readLOINCommand() throws IOException
 	{
-		/* First, we read a space character */
-		if(ProtocolUtils.read_char(in) != ' ')
-			return false;
-		
 		List<String> params = readCommandTwoParameters();
 		
 		if(params == null)
@@ -160,8 +156,13 @@ public class Protocol implements IProtocol{
 			currentUser.setSocket(userSocket);
 			usersOnline.add(currentUser);
 			writeLGGDCommand();
+			writeFRDSCommand();
+
+			List<String> pendingMessages = AccessDB.getPendingMessages(userName);
+			for(String msg: pendingMessages)
+				writeRVEDCommand(msg.split(START_TAG)[1], msg.split(START_TAG)[0]);
 		}
-		
+
 		return isLogged;
 	}
 
@@ -172,10 +173,6 @@ public class Protocol implements IProtocol{
 	 */
 	private boolean readLOUTCommand() throws IOException
 	{
-		/* First, we read a space character */
-		if(ProtocolUtils.read_char(in) != ' ')
-			return false;
-		
 		if(currentUser == null || !currentUser.isUserLogged())
 			return false;
 
@@ -214,22 +211,32 @@ public class Protocol implements IProtocol{
 		{
 			Iterator<UserSocketData> iterSocketFriend = usersOnline.iterator();
 			UserSocketData friendSocketData = null;
+			friendFound = false;
 			while(iterSocketFriend.hasNext() && !friendFound)
 			{
 				friendSocketData = iterSocketFriend.next();
 				friendFound = friend.equals(friendSocketData.getUser());
 			}
+
+			/* Message and date */
+			DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+			Date date = new Date();
+			message = message.concat(df.format(date));
 			
 			if(friendFound)
 			{
 				DataOutputStream auxOut = out;
+				writeSDEDCommand(friend);
 				out = new DataOutputStream(friendSocketData.getSocket().getOutputStream());
 				writeRVEDCommand(friend, message);
 				out = auxOut;
-				writeSDEDCommand(friend);
+			}
+			else
+			{
+				friendFound = AccessDB.addPendingMessage(friend, currentUser.getUser(), message);
 			}
 		}
-		
+
 		return friendFound;
 	}
 
@@ -304,20 +311,12 @@ public class Protocol implements IProtocol{
 		if(ProtocolUtils.read_char(in) != ' ')
 			return null;
 		
-		/* We read a 32-bit tag parameter <START_PARAMETER> */
-		if(!ProtocolUtils.read_command32(in).equals(Command.START_TAG))
-			return null;
-		
 		String param = null;
 		
 		int numberChars = ProtocolUtils.read_int32(in);
 		param = ProtocolUtils.read_command_variable(in, numberChars);
 		
-		if(!ProtocolUtils.read_command32(in).equals(Command.END_TAG))
-			return null;
-		
 		return param;
-		
 	}
 	
 	/**
@@ -327,8 +326,8 @@ public class Protocol implements IProtocol{
 	 */
 	private List<String> readCommandTwoParameters() throws IOException
 	{
-		/* We read a 32-bit tag parameter <START_PARAMETER> */
-		if(!ProtocolUtils.read_command32(in).equals(Command.START_TAG))
+		/* First, we read a space character */
+		if(ProtocolUtils.read_char(in) != ' ')
 			return null;
 			
 		List<String> params = new ArrayList<>();
@@ -336,21 +335,13 @@ public class Protocol implements IProtocol{
 		int numberChars = ProtocolUtils.read_int32(in);
 		params.add(ProtocolUtils.read_command_variable(in, numberChars));
 		
-		if(!ProtocolUtils.read_command32(in).equals(Command.END_TAG) ||
-		   !ProtocolUtils.read_command32(in).equals(Command.START_TAG))
-			return null;
-		
 		numberChars = ProtocolUtils.read_int32(in);
 		params.add(ProtocolUtils.read_command_variable(in, numberChars));
-		
-		if(!ProtocolUtils.read_command32(in).equals(Command.END_TAG))
-			return null;
 		
 		if(params.size() != 2)
 			params = null;
 		
 		return params;
-		
 	}
 
 	
@@ -371,6 +362,63 @@ public class Protocol implements IProtocol{
 			e.printStackTrace();
 		}
 	}
+
+    /**
+     * FRDS command sent to client, LIST OF FRIENDS
+     */
+	@Override
+	public void writeFRDSCommand()
+	{
+        List<String> friends = AccessDB.getFriendsOf(currentUser.getUser(), currentUser.getPassword());
+        if(friends == null)
+        {
+            writeNFDSCommand();
+            return;
+        }
+
+        Iterator<String> iter = friends.iterator();
+        List<String> friendsAndStatus = new ArrayList<>();
+
+		while(iter.hasNext())
+		{
+			String friendName = iter.next();
+
+            UserSocketData friendSocketData = null;
+            boolean friendFound = false;
+
+            Iterator<UserSocketData> iterSocketFriend = usersOnline.iterator();
+            while(iterSocketFriend.hasNext() && !friendFound)
+            {
+                friendSocketData = iterSocketFriend.next();
+                friendFound = friendName.equals(friendSocketData.getUser());
+            }
+
+            if(friendFound)
+                friendName = friendName.concat("I"); // Friend Online
+            else
+                friendName = friendName.concat("O"); // Friend Offline
+
+            friendsAndStatus.add(friendName);
+		}
+
+        sendCommandVariableParameters(LIST_FRIENDS, friendsAndStatus);
+	}
+
+    /**
+     * NFDS command sent to client, NO FRIENDS
+     */
+    @Override
+    public void writeNFDSCommand()
+    {
+        try
+        {
+            ProtocolUtils.write_command32(out, NO_FRIENDS);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
 	/**
 	 * SDED command sent to client, MESSAGE SENT
@@ -447,7 +495,7 @@ public class Protocol implements IProtocol{
 	/**
 	 * Skeleton of command with 1 parameter
 	 * @param command
-	 * @param friend
+	 * @param param
 	 */
 	private void sendCommandOneParameter(String command, String param)
 	{
@@ -455,10 +503,8 @@ public class Protocol implements IProtocol{
 		{
 			ProtocolUtils.write_command32(out, command);
 			ProtocolUtils.write_char(out, ' ');
-			ProtocolUtils.write_command32(out, START_TAG);
 			ProtocolUtils.write_int32(out, param.length());
 			ProtocolUtils.write_command_variable(out, param);
-			ProtocolUtils.write_command32(out, END_TAG);
 		}
 		catch (IOException e)
 		{
@@ -469,7 +515,8 @@ public class Protocol implements IProtocol{
 	/**
 	 * Skeleton of command with 2 parameters
 	 * @param command
-	 * @param friend
+     * @param param1
+     * @param param2
 	 */
 	private void sendCommandTwoParameters(String command, String param1, String param2)
 	{
@@ -477,14 +524,35 @@ public class Protocol implements IProtocol{
 		{
 			ProtocolUtils.write_command32(out, command);
 			ProtocolUtils.write_char(out, ' ');
-			ProtocolUtils.write_command32(out, START_TAG);
 			ProtocolUtils.write_int32(out, param1.length());
 			ProtocolUtils.write_command_variable(out, param1);
-			ProtocolUtils.write_command32(out, END_TAG);
-			ProtocolUtils.write_command32(out, START_TAG);
 			ProtocolUtils.write_int32(out, param2.length());
 			ProtocolUtils.write_command_variable(out, param2);
-			ProtocolUtils.write_command32(out, END_TAG);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Skeleton of command with multiple parameters
+	 * @param command
+	 * @param params
+	 */
+	private void sendCommandVariableParameters(String command, List<String> params)
+	{
+		try
+		{
+			ProtocolUtils.write_command32(out, command);
+			ProtocolUtils.write_char(out, ' ');
+			ProtocolUtils.write_int32(out, params.size());
+			
+			for(String param: params)
+			{
+				ProtocolUtils.write_int32(out, param.length());
+				ProtocolUtils.write_command_variable(out, param); // Last character for status of friend
+			}
 		}
 		catch (IOException e)
 		{

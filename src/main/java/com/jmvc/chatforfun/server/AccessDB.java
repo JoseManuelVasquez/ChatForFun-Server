@@ -1,9 +1,13 @@
 package com.jmvc.chatforfun.server;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.jmvc.chatforfun.model.DAOPendingMessage;
 import com.jmvc.chatforfun.model.DAOUser;
+import com.jmvc.chatforfun.model.DTOPendingMessage;
 import com.jmvc.chatforfun.model.DTOUser;
+import com.jmvc.chatforfun.protocol.Command;
 
 /**
  * @author JMVC
@@ -43,7 +47,7 @@ public final class AccessDB {
 		DTOUser dtoUser = new DTOUser(user, password);
 		if(!daoUser.existsUser(dtoUser))
 			return false;
-		
+
 		return true;
 	}
 	
@@ -102,7 +106,13 @@ public final class AccessDB {
 		
 		return true;
 	}
-	
+
+	/**
+	 * Get friends of a specific user
+	 * @param user
+	 * @param password
+	 * @return List
+	 */
 	public static List<String> getFriendsOf(String user, String password)
 	{
 		DAOUser daoUser = new DAOUser();
@@ -115,5 +125,48 @@ public final class AccessDB {
 			return null;
 		
 		return friends;
+	}
+
+	/**
+	 * Add a pending message
+	 * @param user
+	 * @param message
+	 * @return boolean
+	 */
+	public static boolean addPendingMessage(String user, String friend, String message)
+	{
+		DAOPendingMessage daoPMessage = new DAOPendingMessage();
+		DTOPendingMessage dtoPMessage = new DTOPendingMessage(user, friend, message);
+		daoPMessage.createMessage(dtoPMessage);
+
+		return true;
+	}
+
+	/**
+	 * Return a list of messages that user has not read yet
+	 * @param user
+	 * @return List
+	 */
+	public static List<String> getPendingMessages(String user)
+	{
+		DAOPendingMessage daoPMessage = new DAOPendingMessage();
+		List<String> messages = daoPMessage.selectAllMessages(user);
+		List<String> fromFriend = daoPMessage.selectAllFriends(user);
+
+		/* We concatenate a list of messages + friends */
+		List<String> messagesFromFriend = new ArrayList<>();
+		String msg;
+		for(int i=0; i < messages.size(); i++)
+		{
+			msg = "";
+			msg = msg.concat(messages.get(i));
+			msg = msg.concat(Command.START_TAG);
+			msg = msg.concat(fromFriend.get(i));
+			messagesFromFriend.add(msg);
+		}
+
+		daoPMessage.deleteAllMessages(user);
+
+		return messagesFromFriend;
 	}
 }
