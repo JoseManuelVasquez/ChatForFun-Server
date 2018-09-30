@@ -33,11 +33,7 @@ public final class Database{
 					{
 						database = new Database();
 						connection = DriverManager.getConnection(DATABASE_CONNECTION);
-
-						/* We need a non-volatile database */
-						File file = new File(DATABASE_NAME);
-						if (!file.exists())
-							createTables();
+						createTables();
 					}
 					catch (SQLException e)
 					{
@@ -130,23 +126,5 @@ public final class Database{
 		statement.executeUpdate(CREATE_TABLE_FRIEND);
         statement.executeUpdate(DROP_TABLE_MESSAGE);
         statement.executeUpdate(CREATE_TABLE_MESSAGE);
-	}
-
-	/**
-	 * Reset our database
-	 */
-	public void resetDatabase()
-	{
-		if (database != null)
-		{
-			try
-			{
-				createTables();
-			}
-			catch (SQLException e)
-			{
-				e.printStackTrace();
-			}
-		}
 	}
 }
