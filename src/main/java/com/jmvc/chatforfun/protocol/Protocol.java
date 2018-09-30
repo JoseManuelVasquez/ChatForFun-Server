@@ -73,10 +73,8 @@ public class Protocol implements IProtocol{
 						break;
 					case LOGOUT:
                         resultCommand = readLOUTCommand();
-						if(resultCommand)
-						    return false;
-						else
-                            writeERROCommand(ERROR_EXPIRED_SESSION);
+						if(!resultCommand)
+						    writeERROCommand(ERROR_EXPIRED_SESSION);
 						break;
 					case SEND_MESSAGE:
 						resultCommand = readSENDCommand();
@@ -99,10 +97,10 @@ public class Protocol implements IProtocol{
 							writeERROCommand(ERROR_UNKNOWN);
 						break;
 					case EXIT:
-						return false;
+						return resultCommand;
 				}
 				
-				return resultCommand;
+				return true;
 			}
 			
 			writeERROCommand(ERROR_BAD_COMMAND);
@@ -111,7 +109,9 @@ public class Protocol implements IProtocol{
 		{
 			e.printStackTrace();
 		}
-		
+
+		/* We consider a bad command as a reason to close connection, */
+		/* because our protocol is well defined */
 		return false;
 	}
 	

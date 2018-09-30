@@ -8,8 +8,10 @@ public final class DBConstants {
 	
 	private DBConstants() {}
 	
-	public static final String DATABASE_NAME = "jdbc:sqlite:chatforfun.db";
-	
+	public static final String DATABASE_NAME = "chatforfun.db";
+
+	public static final String DATABASE_CONNECTION = "jdbc:sqlite:chatforfun.db";
+
 	public static final int TIMEOUT = 30;
 	
 	public static final String USER_FIELD = "username";

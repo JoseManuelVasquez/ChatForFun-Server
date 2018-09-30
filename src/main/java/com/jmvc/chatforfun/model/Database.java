@@ -2,6 +2,7 @@ package com.jmvc.chatforfun.model;
 
 import static com.jmvc.chatforfun.model.DBConstants.*;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -22,17 +23,21 @@ public final class Database{
 	
 	public static Database getDatabase()
 	{
-		if(database == null)
+		if (database == null)
 		{
 			synchronized(Database.class)
 			{
-				if(database == null)
+				if (database == null)
 				{
 					try
 					{
 						database = new Database();
-						connection = DriverManager.getConnection(DATABASE_NAME);
-						createTables();
+						connection = DriverManager.getConnection(DATABASE_CONNECTION);
+
+						/* We need a non-volatile database */
+						File file = new File(DATABASE_NAME);
+						if (!file.exists())
+							createTables();
 					}
 					catch (SQLException e)
 					{
@@ -51,11 +56,11 @@ public final class Database{
 	 */
 	public void executeStatement(String sql)
 	{
-		if(database != null)
+		if (database != null)
 		{
 			synchronized(Database.class)
 			{
-				if(database != null)
+				if (database != null)
 				{
 					try
 					{
@@ -81,7 +86,7 @@ public final class Database{
 	 */
 	public ResultSet executeQuery(String query)
 	{
-		if(database != null)
+		if (database != null)
 		{
 			try
 			{
@@ -117,7 +122,7 @@ public final class Database{
 	{
 		Statement statement = connection.createStatement();
 		statement.setQueryTimeout(TIMEOUT);
-		
+
 		/* We first create new tables after dropping tables */
 		statement.executeUpdate(DROP_TABLE_USER);
 		statement.executeUpdate(CREATE_TABLE_USER);
@@ -127,4 +132,21 @@ public final class Database{
         statement.executeUpdate(CREATE_TABLE_MESSAGE);
 	}
 
+	/**
+	 * Reset our database
+	 */
+	public void resetDatabase()
+	{
+		if (database != null)
+		{
+			try
+			{
+				createTables();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
 }

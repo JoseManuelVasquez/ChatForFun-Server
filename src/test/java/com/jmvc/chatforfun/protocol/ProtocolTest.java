@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import com.jmvc.chatforfun.model.Database;
+import com.jmvc.chatforfun.server.AccessDB;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -71,6 +73,10 @@ class ProtocolTest {
 					Socket clientSocket = new Socket(HOST, PORT);
 					DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
 					DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
+
+					/* We reset out database */
+					Database database = Database.getDatabase();
+					database.resetDatabase();
 					
 					/* REGISTER COMMAND */
 					
