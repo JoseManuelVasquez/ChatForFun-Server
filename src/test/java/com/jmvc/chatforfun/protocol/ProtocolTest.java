@@ -80,6 +80,10 @@ class ProtocolTest {
 					ProtocolUtils.write_command_variable(dos, USERNAME);
 					ProtocolUtils.write_int32(dos, PASSWORD.length());
 					ProtocolUtils.write_command_variable(dos, PASSWORD);
+
+					String command = ProtocolUtils.read_command32(dis);
+					System.out.println("Server Response: " + command);
+					assertEquals(REGISTERED, command);
 					
 					/* LOGIN COMMAND */
 					
@@ -90,7 +94,7 @@ class ProtocolTest {
 					ProtocolUtils.write_int32(dos, PASSWORD.length());
 					ProtocolUtils.write_command_variable(dos, PASSWORD);
 
-					String command = ProtocolUtils.read_command32(dis);
+					command = ProtocolUtils.read_command32(dis);
 					System.out.println("Server Response: " + command);
 					assertEquals(LOGGED_IN, command);
 
@@ -108,6 +112,10 @@ class ProtocolTest {
                     ProtocolUtils.write_command_variable(dos, USERNAME2);
                     ProtocolUtils.write_int32(dos, PASSWORD2.length());
                     ProtocolUtils.write_command_variable(dos, PASSWORD2);
+
+					command = ProtocolUtils.read_command32(dis);
+					System.out.println("Server Response: " + command);
+					assertEquals(REGISTERED, command);
 
                     /* LOGIN  */
                     ProtocolUtils.write_command32(dos, LOGIN);
@@ -193,6 +201,10 @@ class ProtocolTest {
 					ProtocolUtils.write_command_variable(dos, USERNAME3);
 					ProtocolUtils.write_int32(dos, PASSWORD3.length());
 					ProtocolUtils.write_command_variable(dos, PASSWORD3);
+
+					command = ProtocolUtils.read_command32(dis);
+					System.out.println("Server Response: " + command);
+					assertEquals(REGISTERED, command);
 
 					/* ADD FRIEND */
 					ProtocolUtils.write_command32(dos, ADD_FRIEND);

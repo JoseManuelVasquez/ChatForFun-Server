@@ -129,8 +129,12 @@ public class Protocol implements IProtocol{
 		
 		String userName = params.get(0);
 		String userPass = params.get(1);
+
+		boolean isRegistered = AccessDB.registerUser(userName, userPass);
+		if (isRegistered)
+			writeRGTDCommand();
 		
-		return AccessDB.registerUser(userName, userPass);
+		return isRegistered;
 	}
 
 	/**
@@ -346,7 +350,23 @@ public class Protocol implements IProtocol{
 
 	
 	/* --------------------------------------- PROTOCOL WRITING METHODS --------------------------------------- */
-	
+
+	/**
+	 * RGTD command sent to client, REGISTERED
+	 */
+	@Override
+	public void writeRGTDCommand()
+	{
+		try
+		{
+			ProtocolUtils.write_command32(out, REGISTERED);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * LGGD command sent to client, LOGGED IN
 	 */

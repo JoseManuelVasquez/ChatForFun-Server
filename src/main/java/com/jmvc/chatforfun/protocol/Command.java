@@ -17,6 +17,8 @@ public final class Command {
 	public static final String DELETE_FRIEND = "DELF";
 	
 	public static final String DELETE_ACCOUNT = "DELA";
+
+	public static final String REGISTERED = "RGTD";
 	
 	public static final String LOGGED_IN = "LGGD";
 	
@@ -43,7 +45,7 @@ public final class Command {
 	public static final String[] VALID_COMMANDS = {"RGST", "LOIN", "LOUT", "SEND", "ADDF",
 												   "DELF", "DELA", "LGGD", "FRDS", "SDED",
 												   "RVED", "ADED", "DELD", "FDIN", "FOUT",
-												   "ERRO", "EXIT", "NFDS"};
+												   "ERRO", "EXIT", "NFDS", "RGTD"};
 	
 	public static final String START_TAG = "" + (char)6 + (char)7 + (char)6 + (char)7;
 	

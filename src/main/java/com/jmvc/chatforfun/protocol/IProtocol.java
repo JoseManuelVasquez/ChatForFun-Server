@@ -12,8 +12,10 @@ public interface IProtocol {
 	
 	/* --------------------------------------- PROTOCOL WRITING METHODS --------------------------------------- */
 	
+	public void writeRGTDCommand();
+
 	public void writeLGGDCommand();
-	
+
 	public void writeFRDSCommand();
 
 	public void writeNFDSCommand();
