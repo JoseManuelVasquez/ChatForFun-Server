@@ -72,7 +72,7 @@ public class Protocol implements IProtocol{
 							writeERROCommand(ERROR_USER_OR_PASSWORD_WRONG);
 						break;
 					case LOGOUT:
-                        resultCommand = readLOUTCommand();
+						resultCommand = readLOUTCommand();
 						if(!resultCommand)
 						    writeERROCommand(ERROR_EXPIRED_SESSION);
 						break;
@@ -268,11 +268,13 @@ public class Protocol implements IProtocol{
 			DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
 			Date date = new Date();
 			message = message.concat(df.format(date));
-			
+
+			/* Message sent */
+			writeSDEDCommand(friend);
+
 			if(friendFound)
 			{
 				DataOutputStream auxOut = out;
-				writeSDEDCommand(friend);
 				out = new DataOutputStream(friendSocketData.getSocket().getOutputStream());
 				writeRVEDCommand(friend, message);
 				out = auxOut;

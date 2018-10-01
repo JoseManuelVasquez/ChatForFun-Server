@@ -234,6 +234,12 @@ class ProtocolTest {
 					ProtocolUtils.write_int32(dos, MESSAGE.length());
 					ProtocolUtils.write_command_variable(dos, MESSAGE);
 
+					command = ProtocolUtils.read_command32(dis);
+					System.out.print("Server Response: " + command +
+							ProtocolUtils.read_char(dis));
+					len = ProtocolUtils.read_int32(dis);
+					System.out.print(ProtocolUtils.read_command_variable(dis, len) + "\n");
+
 					/* LOGIN */
 					ProtocolUtils.write_command32(dos, LOGIN);
 					ProtocolUtils.write_char(dos, ' ');
