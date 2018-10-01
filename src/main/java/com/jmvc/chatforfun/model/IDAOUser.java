@@ -16,7 +16,7 @@ public interface IDAOUser {
 	
 	public void deleteFriend(DTOUser user, String friend);
 	
-	public boolean existsUser(DTOUser user);
+	public boolean existsUser(String user);
 	
 	public boolean isFriendOf(DTOUser user, String friend);
 	

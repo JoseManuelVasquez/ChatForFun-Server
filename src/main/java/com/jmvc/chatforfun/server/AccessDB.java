@@ -27,7 +27,7 @@ public final class AccessDB {
 	{
 		DAOUser daoUser = new DAOUser();
 		DTOUser dtoUser = new DTOUser(user, password);
-		if(daoUser.existsUser(dtoUser))
+		if(daoUser.existsUser(user))
 			return false;
 		
 		daoUser.createUser(dtoUser);
@@ -45,7 +45,7 @@ public final class AccessDB {
 	{
 		DAOUser daoUser = new DAOUser();
 		DTOUser dtoUser = new DTOUser(user, password);
-		if(!daoUser.existsUser(dtoUser))
+		if(!daoUser.existsUser(user))
 			return false;
 
 		return true;
@@ -61,7 +61,7 @@ public final class AccessDB {
 	{
 		DAOUser daoUser = new DAOUser();
 		DTOUser dtoUser = new DTOUser(user, password);
-		if(!daoUser.existsUser(dtoUser))
+		if(!daoUser.existsUser(user))
 			return false;
 		
 		daoUser.deleteUser(dtoUser);
@@ -80,9 +80,9 @@ public final class AccessDB {
 	{
 		DAOUser daoUser = new DAOUser();
 		DTOUser dtoUser = new DTOUser(user, password);
-		if(!daoUser.existsUser(dtoUser))
+		if(!daoUser.existsUser(friend))
 			return false;
-		
+
 		daoUser.createFriend(dtoUser, friend);
 		
 		return true;
@@ -99,7 +99,7 @@ public final class AccessDB {
 	{
 		DAOUser daoUser = new DAOUser();
 		DTOUser dtoUser = new DTOUser(user, password);
-		if(!daoUser.existsUser(dtoUser) || !daoUser.isFriendOf(dtoUser, friend))
+		if(!daoUser.existsUser(friend) || !daoUser.isFriendOf(dtoUser, friend))
 			return false;
 		
 		daoUser.deleteFriend(dtoUser, friend);
@@ -117,7 +117,7 @@ public final class AccessDB {
 	{
 		DAOUser daoUser = new DAOUser();
 		DTOUser dtoUser = new DTOUser(user, password);
-		if(!daoUser.existsUser(dtoUser))
+		if(!daoUser.existsUser(user))
 			return null;
 		
 		List<String> friends = daoUser.selectFriends(dtoUser);

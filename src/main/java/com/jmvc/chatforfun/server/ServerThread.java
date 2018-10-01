@@ -33,7 +33,7 @@ public class ServerThread implements Runnable{
 	{
 		this.client = client;
 		/* Timeout of 30 seconds */
-		client.setSoTimeout(30*1000);
+		client.setSoTimeout(2*60*60*1000);
 	}
 	
 	/**
@@ -64,10 +64,7 @@ public class ServerThread implements Runnable{
 		try
 		{
 			protocol = new Protocol(client);
-			while(protocol.readValidCommand())
-			{
-				//TODO
-			}
+			while(protocol.readValidCommand());
 			client.close();
 		}
 		catch (IOException e)

@@ -7,8 +7,6 @@ package com.jmvc.chatforfun.model;
 public final class DBConstants {
 	
 	private DBConstants() {}
-	
-	public static final String DATABASE_NAME = "chatforfun.db";
 
 	public static final String DATABASE_CONNECTION = "jdbc:sqlite:chatforfun.db";
 
@@ -47,9 +45,9 @@ public final class DBConstants {
 		return "INSERT INTO friend VALUES(\"" + user + "\",\"" + friend + "\")";
 	}
 	
-	public static final String selectUser(String user, String password)
+	public static final String selectUser(String user)
 	{
-		return "SELECT username FROM user WHERE username = \"" + user + "\" and password = \"" + password + "\"";
+		return "SELECT username FROM user WHERE username = \"" + user + "\"";
 	}
 	
 	public static final String selectFriendOf(String user)

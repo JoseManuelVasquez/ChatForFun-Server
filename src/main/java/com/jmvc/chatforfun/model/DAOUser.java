@@ -66,9 +66,9 @@ public class DAOUser implements IDAOUser {
 	}
 
 	@Override
-	public boolean existsUser(DTOUser user)
+	public boolean existsUser(String user)
 	{
-		ResultSet resultSet = database.executeQuery(selectUser(user.getUserName(), user.getPassword()));
+		ResultSet resultSet = database.executeQuery(selectUser(user));
 		List<String> users = new ArrayList<>();
 		
 		try
