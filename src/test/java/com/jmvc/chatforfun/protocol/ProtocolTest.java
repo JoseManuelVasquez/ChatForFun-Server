@@ -170,6 +170,12 @@ class ProtocolTest {
                     }
                     System.out.println();
 
+					command = ProtocolUtils.read_command32(dis);
+					System.out.print("Server Response: " + command +
+							ProtocolUtils.read_char(dis));
+					len = ProtocolUtils.read_int32(dis);
+					System.out.print(ProtocolUtils.read_command_variable(dis, len) + "\n");
+
                     /* SEND A MESSAGE TO FRIEND */
 
 					ProtocolUtils.write_command32(dos, SEND_MESSAGE);
@@ -257,6 +263,18 @@ class ProtocolTest {
 							ProtocolUtils.read_char(dis));
 					len = ProtocolUtils.read_int32(dis);
 					System.out.print(ProtocolUtils.read_command_variable(dis, len) + " ");
+					len = ProtocolUtils.read_int32(dis);
+					System.out.print(ProtocolUtils.read_command_variable(dis, len) + "\n");
+
+					command = ProtocolUtils.read_command32(dis);
+					System.out.print("Server Response: " + command +
+							ProtocolUtils.read_char(dis));
+					len = ProtocolUtils.read_int32(dis);
+					System.out.print(ProtocolUtils.read_command_variable(dis, len) + "\n");
+
+					command = ProtocolUtils.read_command32(dis);
+					System.out.print("Server Response: " + command +
+							ProtocolUtils.read_char(dis));
 					len = ProtocolUtils.read_int32(dis);
 					System.out.print(ProtocolUtils.read_command_variable(dis, len) + "\n");
 

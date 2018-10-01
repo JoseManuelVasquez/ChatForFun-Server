@@ -165,6 +165,27 @@ public class Protocol implements IProtocol{
 			List<String> pendingMessages = AccessDB.getPendingMessages(userName);
 			for(String msg: pendingMessages)
 				writeRVEDCommand(msg.split(START_TAG)[1], msg.split(START_TAG)[0]);
+
+			List<String> friends = AccessDB.getFriendsOf(currentUser.getUser(), currentUser.getPassword());
+			if (friends != null)
+			{
+				Iterator<String> iter = friends.iterator();
+				String friend;
+				while (iter.hasNext()) {
+					friend = iter.next();
+					Iterator<UserSocketData> iterSocketFriend = usersOnline.iterator();
+					UserSocketData friendSocketData;
+					while (iterSocketFriend.hasNext()) {
+						friendSocketData = iterSocketFriend.next();
+						if (friend.equals(friendSocketData.getUser())) {
+							DataOutputStream auxOut = out;
+							out = new DataOutputStream(friendSocketData.getSocket().getOutputStream());
+							writeFDINCommand(currentUser.getUser());
+							out = auxOut;
+						}
+					}
+				}
+			}
 		}
 
 		return isLogged;
@@ -182,6 +203,27 @@ public class Protocol implements IProtocol{
 
 		usersOnline.remove(currentUser);
 		currentUser = null;
+
+		List<String> friends = AccessDB.getFriendsOf(currentUser.getUser(), currentUser.getPassword());
+		if (friends != null)
+		{
+			Iterator<String> iter = friends.iterator();
+			String friend;
+			while (iter.hasNext()) {
+				friend = iter.next();
+				Iterator<UserSocketData> iterSocketFriend = usersOnline.iterator();
+				UserSocketData friendSocketData;
+				while (iterSocketFriend.hasNext()) {
+					friendSocketData = iterSocketFriend.next();
+					if (friend.equals(friendSocketData.getUser())) {
+						DataOutputStream auxOut = out;
+						out = new DataOutputStream(friendSocketData.getSocket().getOutputStream());
+						writeFOUTCommand(currentUser.getUser());
+						out = auxOut;
+					}
+				}
+			}
+		}
 		
 		return true;
 	}
@@ -281,6 +323,8 @@ public class Protocol implements IProtocol{
 		
 		if(friend == null)
 			return false;
+
+		AccessDB.deleteFriend(currentUser.getUser(), currentUser.getPassword(), friend);
 		
 		writeDELDCommand(friend);
 		
@@ -480,18 +524,18 @@ public class Protocol implements IProtocol{
 	 * FDIN command sent to client, FRIEND HAS LOGGED IN
 	 */
 	@Override
-	public void writeFDINCommand(String friend)
+	public void writeFDINCommand(String user)
 	{
-		sendCommandOneParameter(FRIEND_LOGGED_IN, friend);
+		sendCommandOneParameter(FRIEND_LOGGED_IN, user);
 	}
 
 	/**
 	 * FOUT command sent to client, FRIEND HAS LOGGED OUT
 	 */
 	@Override
-	public void writeFOUTCommand(String friend)
+	public void writeFOUTCommand(String user)
 	{
-		sendCommandOneParameter(FRIEND_LOGGED_OUT, friend);
+		sendCommandOneParameter(FRIEND_LOGGED_OUT, user);
 	}
 
 	/**

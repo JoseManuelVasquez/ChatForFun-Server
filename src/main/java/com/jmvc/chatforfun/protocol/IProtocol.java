@@ -28,9 +28,9 @@ public interface IProtocol {
 	
 	public void writeDELDCommand(String friend);
 	
-	public void writeFDINCommand(String friend);
+	public void writeFDINCommand(String user);
 	
-	public void writeFOUTCommand(String friend);
+	public void writeFOUTCommand(String user);
 	
 	public void writeERROCommand(int errorCode);
 	
