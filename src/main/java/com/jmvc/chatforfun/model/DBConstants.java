@@ -49,6 +49,11 @@ public final class DBConstants {
 	{
 		return "SELECT username FROM user WHERE username = \"" + user + "\"";
 	}
+
+	public static final String selectUser(String user, String password)
+	{
+		return "SELECT username FROM user WHERE username = \"" + user + "\" and password = \"" + password + "\"";
+	}
 	
 	public static final String selectFriendOf(String user)
 	{

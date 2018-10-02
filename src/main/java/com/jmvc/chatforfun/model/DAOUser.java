@@ -30,6 +30,7 @@ public class DAOUser implements IDAOUser {
 	public void createFriend(DTOUser user, String friend)
 	{
 		database.executeStatement(insertFriend(user.getUserName(), friend));
+		database.executeStatement(insertFriend(friend, user.getUserName()));
 	}
 
 	@Override
@@ -87,6 +88,31 @@ public class DAOUser implements IDAOUser {
 			e.printStackTrace();
 		}
 		
+		return false;
+	}
+
+	@Override
+	public boolean existsUser(DTOUser user)
+	{
+		ResultSet resultSet = database.executeQuery(selectUser(user.getUserName(), user.getPassword()));
+		List<String> users = new ArrayList<>();
+
+		try
+		{
+			while(resultSet.next())
+				users.add(resultSet.getString(USER_FIELD));
+
+			if(!users.isEmpty())
+			{
+				if(users.get(0) != null)
+					return true;
+			}
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
 		return false;
 	}
 

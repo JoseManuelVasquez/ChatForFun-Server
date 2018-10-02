@@ -307,6 +307,23 @@ public class Protocol implements IProtocol{
 			return false;
 			
 		writeADEDCommand(friend);
+
+		Iterator<UserSocketData> iterSocketFriend = usersOnline.iterator();
+		UserSocketData friendSocketData = null;
+		boolean friendFound = false;
+		while(iterSocketFriend.hasNext() && !friendFound)
+		{
+			friendSocketData = iterSocketFriend.next();
+			friendFound = friend.equals(friendSocketData.getUser());
+		}
+
+		if(friendFound)
+		{
+			DataOutputStream auxOut = out;
+			out = new DataOutputStream(friendSocketData.getSocket().getOutputStream());
+			writeADEDCommand(currentUser.getUser());
+			out = auxOut;
+		}
 		
 		return true;
 	}

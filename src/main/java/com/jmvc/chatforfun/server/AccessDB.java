@@ -45,7 +45,7 @@ public final class AccessDB {
 	{
 		DAOUser daoUser = new DAOUser();
 		DTOUser dtoUser = new DTOUser(user, password);
-		if(!daoUser.existsUser(user))
+		if(!daoUser.existsUser(dtoUser))
 			return false;
 
 		return true;
@@ -61,7 +61,7 @@ public final class AccessDB {
 	{
 		DAOUser daoUser = new DAOUser();
 		DTOUser dtoUser = new DTOUser(user, password);
-		if(!daoUser.existsUser(user))
+		if(!daoUser.existsUser(dtoUser))
 			return false;
 		
 		daoUser.deleteUser(dtoUser);
@@ -80,7 +80,7 @@ public final class AccessDB {
 	{
 		DAOUser daoUser = new DAOUser();
 		DTOUser dtoUser = new DTOUser(user, password);
-		if(!daoUser.existsUser(friend))
+		if(!daoUser.existsUser(friend) || daoUser.isFriendOf(dtoUser, friend))
 			return false;
 
 		daoUser.createFriend(dtoUser, friend);
