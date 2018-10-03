@@ -43,6 +43,7 @@ public class DAOUser implements IDAOUser {
 	public void deleteFriend(DTOUser user, String friend)
 	{
 		database.executeStatement(deleteFriendQuery(user.getUserName(), friend));
+		database.executeStatement(deleteFriendQuery(friend, user.getUserName()));
 	}
 
 	@Override
