@@ -364,6 +364,23 @@ public class Protocol implements IProtocol{
 		AccessDB.deleteFriend(currentUser.getUser(), currentUser.getPassword(), friend);
 		
 		writeDELDCommand(friend);
+
+		Iterator<UserSocketData> iterSocketFriend = usersOnline.iterator();
+		UserSocketData friendSocketData = null;
+		boolean friendFound = false;
+		while(iterSocketFriend.hasNext() && !friendFound)
+		{
+			friendSocketData = iterSocketFriend.next();
+			friendFound = friend.equals(friendSocketData.getUser());
+		}
+
+		if(friendFound)
+		{
+			DataOutputStream auxOut = out;
+			out = new DataOutputStream(friendSocketData.getSocket().getOutputStream());
+			writeDELDCommand(currentUser.getUser());
+			out = auxOut;
+		}
 		
 		return true;
 	}
