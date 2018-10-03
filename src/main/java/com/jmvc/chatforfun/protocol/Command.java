@@ -24,6 +24,8 @@ public final class Command {
 	
 	public static final String LIST_FRIENDS = "FRDS";
 
+	public static final String LOGGED_OUT = "LGUT";
+
 	public static final String NO_FRIENDS = "NFDS";
 	
 	public static final String MESSAGE_SENT = "SDED";

@@ -57,7 +57,7 @@ public final class DBConstants {
 	
 	public static final String selectFriendOf(String user)
 	{
-		return "SELECT friend.friend FROM user JOIN friend ON user.username = \"" + user + "\"";
+		return "SELECT friend FROM friend WHERE username = \"" + user + "\"";
 	}
 	
 	public static final String deleteUserQuery(String user, String password)

@@ -18,6 +18,8 @@ public interface IProtocol {
 
 	public void writeFRDSCommand();
 
+	public void writeLGUTCommand();
+
 	public void writeNFDSCommand();
 	
 	public void writeSDEDCommand(String friend);

@@ -173,16 +173,22 @@ public class Protocol implements IProtocol{
 				String friend;
 				while (iter.hasNext()) {
 					friend = iter.next();
+
 					Iterator<UserSocketData> iterSocketFriend = usersOnline.iterator();
-					UserSocketData friendSocketData;
-					while (iterSocketFriend.hasNext()) {
+					UserSocketData friendSocketData = null;
+					boolean friendFound = false;
+					while(iterSocketFriend.hasNext() && !friendFound)
+					{
 						friendSocketData = iterSocketFriend.next();
-						if (friend.equals(friendSocketData.getUser())) {
-							DataOutputStream auxOut = out;
-							out = new DataOutputStream(friendSocketData.getSocket().getOutputStream());
-							writeFDINCommand(currentUser.getUser());
-							out = auxOut;
-						}
+						friendFound = friend.equals(friendSocketData.getUser());
+					}
+
+					if(friendFound)
+					{
+						DataOutputStream auxOut = out;
+						out = new DataOutputStream(friendSocketData.getSocket().getOutputStream());
+						writeFDINCommand(currentUser.getUser());
+						out = auxOut;
 					}
 				}
 			}
@@ -201,9 +207,6 @@ public class Protocol implements IProtocol{
 		if(currentUser == null || !currentUser.isUserLogged())
 			return false;
 
-		usersOnline.remove(currentUser);
-		currentUser = null;
-
 		List<String> friends = AccessDB.getFriendsOf(currentUser.getUser(), currentUser.getPassword());
 		if (friends != null)
 		{
@@ -211,19 +214,30 @@ public class Protocol implements IProtocol{
 			String friend;
 			while (iter.hasNext()) {
 				friend = iter.next();
+
 				Iterator<UserSocketData> iterSocketFriend = usersOnline.iterator();
-				UserSocketData friendSocketData;
-				while (iterSocketFriend.hasNext()) {
+				UserSocketData friendSocketData = null;
+				boolean friendFound = false;
+				while(iterSocketFriend.hasNext() && !friendFound)
+				{
 					friendSocketData = iterSocketFriend.next();
-					if (friend.equals(friendSocketData.getUser())) {
-						DataOutputStream auxOut = out;
-						out = new DataOutputStream(friendSocketData.getSocket().getOutputStream());
-						writeFOUTCommand(currentUser.getUser());
-						out = auxOut;
-					}
+					friendFound = friend.equals(friendSocketData.getUser());
+				}
+
+				if(friendFound)
+				{
+					DataOutputStream auxOut = out;
+					out = new DataOutputStream(friendSocketData.getSocket().getOutputStream());
+					writeFOUTCommand(currentUser.getUser());
+					out = auxOut;
 				}
 			}
 		}
+
+		writeLGUTCommand();
+
+		usersOnline.remove(currentUser);
+		currentUser = null;
 		
 		return true;
 	}
@@ -248,10 +262,14 @@ public class Protocol implements IProtocol{
 		String message = params.get(1);
 		
 		List<String> friends = AccessDB.getFriendsOf(currentUser.getUser(), currentUser.getPassword());
-		Iterator<String> iter = friends.iterator();
 		boolean friendFound = false;
-		while(iter.hasNext() && !friendFound)
-			friendFound = friend.equals(iter.next());
+		if (friends != null)
+		{
+			Iterator<String> iter = friends.iterator();
+
+			while(iter.hasNext() && !friendFound)
+				friendFound = friend.equals(iter.next());
+		}
 		
 		if(friendFound)
 		{
@@ -276,7 +294,7 @@ public class Protocol implements IProtocol{
 			{
 				DataOutputStream auxOut = out;
 				out = new DataOutputStream(friendSocketData.getSocket().getOutputStream());
-				writeRVEDCommand(friend, message);
+				writeRVEDCommand(currentUser.getUser(), message);
 				out = auxOut;
 			}
 			else
@@ -485,6 +503,22 @@ public class Protocol implements IProtocol{
 		}
 
         sendCommandVariableParameters(LIST_FRIENDS, friendsAndStatus);
+	}
+
+	/**
+	 * LGUT command sent to client, YOU'VE BEEN LOGGED OUT
+	 */
+	@Override
+	public void writeLGUTCommand()
+	{
+		try
+		{
+			ProtocolUtils.write_command32(out, LOGGED_OUT);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
     /**

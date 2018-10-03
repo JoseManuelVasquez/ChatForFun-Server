@@ -121,7 +121,7 @@ public class DAOUser implements IDAOUser {
 	{
 		ResultSet resultSet = database.executeQuery(selectFriendOf(user.getUserName()));
 		List<String> friends = new ArrayList<>();
-		
+
 		try
 		{
 			while(resultSet.next())
